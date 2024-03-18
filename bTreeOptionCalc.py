@@ -9,6 +9,9 @@ import pygame
 # User-defined Parameters (Inputs)
 # ------------------------------
 
+# Display the graph
+DISPLAY = False
+
 # Initial stock price
 STOCK_PRICE = 40
 
@@ -19,7 +22,7 @@ EX_PRICE = 40
 RISK_FREE_PCT = 4
 
 # Number of time steps in the binomial model
-TIME_STEPS = 101
+TIME_STEPS = 15
 
 # Time to maturity (in years)
 TIME_TO_MATURITY = 6/12
@@ -59,8 +62,6 @@ def option_tree(stock_price, ex_price, uptick, downtick, risk_free_pct, time_ste
             down_value = option_tree[step + 1][j]
             expected_value = p * up_value + (1 - p) * down_value
             option_tree[step][j] = max(0, discount_factor * expected_value)
-
-    print("Option price at the root: ", option_tree[0][0])
     return stock_tree, option_tree
 
 def draw_tree(screen, stock_tree, option_tree, height, time_steps, offset_x, offset_y, zoom):
@@ -149,4 +150,20 @@ def visualize_binomial_tree(stock_price, ex_price, uptick, downtick, risk_free_p
 # ------------------------------
 
 if __name__ == "__main__":
-    visualize_binomial_tree(STOCK_PRICE, EX_PRICE, UPTICK, DOWNTICK, RISK_FREE_PCT, TIME_STEPS, DELTA_TIME_STEP)
+
+    if DISPLAY:
+        visualize_binomial_tree(STOCK_PRICE, EX_PRICE, UPTICK, DOWNTICK, RISK_FREE_PCT, TIME_STEPS, DELTA_TIME_STEP)
+    else: 
+        tree, option_price_tree = option_tree(STOCK_PRICE, EX_PRICE, UPTICK, DOWNTICK, RISK_FREE_PCT, TIME_STEPS, DELTA_TIME_STEP)
+        
+        # Print detailed option pricing information
+        print("\n--- Option Pricing Summary ---\n")
+        print("Underlying Stock Price at Start: ${:.2f}".format(STOCK_PRICE))
+        print("Exercise Price of the Option: ${:.2f}".format(EX_PRICE))
+        print("Risk-Free Interest Rate: {:.2f}%".format(RISK_FREE_PCT))
+        print("Time Steps: {}".format(TIME_STEPS))
+        print("Time to Maturity: {:.2f} years".format(TIME_TO_MATURITY))
+        print("Volatility: {:.2f}%".format(VOLATILITY))
+        print("\nOption Price at the Root (Current Option Value): ${:.2f}".format(option_price_tree[0][0]))
+        print("\nNote: The calculated option price is based on the binomial option pricing model, using the provided parameters.")
+        print("This value represents the fair price of the European option given the current market conditions.\n")
